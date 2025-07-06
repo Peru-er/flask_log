@@ -1,0 +1,28 @@
+
+import pytest
+from flask import Flask, request, jsonify
+
+def create_app():
+    app = Flask(__name__)
+
+    @app.route('/login', methods=['POST'])
+    def login():
+        data = request.get_json()
+        if data.get("username") == "admin" and data.get("password") == "secret":
+            return jsonify({"message": "Login successful"}), 200
+        return jsonify({"message": "Invalid credentials"}), 401
+
+    return app
+
+def test_login_success():
+    app = create_app()
+    client = app.test_client()
+
+    response = client.post('/login', json={
+        "username": "admin",
+        "password": "secret"
+    })
+
+    assert response.status_code == 200
+    assert response.get_json() == {"message": "Login successful"}
+
